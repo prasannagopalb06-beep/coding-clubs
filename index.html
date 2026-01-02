@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AptiCoder Quiz</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+:root{
+  --primary:#1e3a8a;
+  --secondary:#2563eb;
+  --bg:#f1f5f9;
+  --card:#ffffff;
+  --success:#16a34a;
+}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial,sans-serif;
+  background:var(--bg);
+}
+header{
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:#fff;
+  padding:20px;
+  text-align:center;
+}
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:15px;
+}
+.card{
+  background:var(--card);
+  border-radius:12px;
+  padding:20px;
+  margin-bottom:20px;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+input[type=text]{
+  width:100%;
+  padding:12px;
+  font-size:16px;
+  border-radius:8px;
+  border:1px solid #cbd5e1;
+}
+.options label{
+  display:block;
+  padding:10px;
+  border-radius:8px;
+  margin-top:6px;
+  border:1px solid #e2e8f0;
+}
+.options label:hover{
+  background:#eff6ff;
+}
+button{
+  width:100%;
+  padding:14px;
+  font-size:18px;
+  border:none;
+  border-radius:30px;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+  color:white;
+  cursor:pointer;
+}
+#result{
+  text-align:center;
+  font-size:22px;
+  font-weight:bold;
+  color:var(--success);
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:10px;
+}
+th,td{
+  padding:10px;
+  text-align:center;
+  border-bottom:1px solid #e2e8f0;
+}
+th{
+  background:#e0e7ff;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🧠 AptiCoder Quiz</h1>
+  <p>Aptitude & Reasoning – MNC Interview Level</p>
+</header>
+
+<div class="container">
+
+<div class="card" id="nameCard">
+  <h3>Enter Your Name</h3>
+  <input type="text" id="username" placeholder="Your Name">
+  <br><br>
+  <button onclick="startQuiz()">Start Quiz</button>
+</div>
+
+<div class="card" id="quizCard" style="display:none;">
+  <div id="questionBox"></div>
+  <br>
+  <button onclick="nextQuestion()">Next</button>
+</div>
+
+<div id="result" class="card" style="display:none;"></div>
+
+<div class="card">
+  <h3>🏆 Leaderboard</h3>
+  <table id="leaderboard">
+    <tr><th>Rank</th><th>Name</th><th>Score</th></tr>
+  </table>
+</div>
+
+</div>
+
+<script>
+const questions = [
+/* 1–10 */
+{q:"1) 20% of 250?",o:["40","50","60","80"],a:1},
+{q:"2) 15 × 8?",o:["100","110","120","130"],a:2},
+{q:"3) CP 500, SP 600. Profit %?",o:["10%","15%","20%","25%"],a:2},
+{q:"4) 2,4,8,16,?",o:["18","24","32","64"],a:2},
+{q:"5) √144?",o:["10","11","12","13"],a:2},
+{q:"6) A can do work in 10 days. One day work?",o:["1/5","1/10","1/20","1/15"],a:1},
+{q:"7) CAT=24, DOG=?",o:["26","25","24","23"],a:0},
+{q:"8) 25% of 400?",o:["50","75","100","150"],a:2},
+{q:"9) 5³=?",o:["15","125","25","75"],a:1},
+{q:"10) Odd one out?",o:["2","4","6","9"],a:3},
+
+/* 11–20 */
+{q:"11) 10m north, 10m south. Distance?",o:["0","10","20","5"],a:0},
+{q:"12) 3:9 :: 4:?",o:["12","14","16","18"],a:0},
+{q:"13) 1,4,9,16,?",o:["20","25","30","36"],a:1},
+{q:"14) A=1, Z=?",o:["24","25","26","27"],a:2},
+{q:"15) 60 km/hr = ? m/s",o:["15","16.67","20","25"],a:1},
+{q:"16) Avg of 10 & 20?",o:["10","15","20","25"],a:1},
+{q:"17) 40% is 80. Number?",o:["160","180","200","240"],a:2},
+{q:"18) 7×9?",o:["56","63","72","49"],a:1},
+{q:"19) 1000 ÷ 25?",o:["25","40","50","75"],a:1},
+{q:"20) Prime number?",o:["9","15","17","21"],a:2},
+
+/* 21–30 */
+{q:"21) 5% of 600?",o:["25","30","35","40"],a:1},
+{q:"22) 2,6,12,20,?",o:["28","30","32","36"],a:1},
+{q:"23) Square of 9?",o:["72","81","64","90"],a:1},
+{q:"24) Odd one out?",o:["Circle","Square","Triangle","Cube"],a:3},
+{q:"25) Ratio 2:3 = ?",o:["0.5","0.66","0.75","1.5"],a:1},
+{q:"26) SI of 1000 at 10% for 2 years?",o:["100","200","300","400"],a:1},
+{q:"27) 81 is square of?",o:["7","8","9","10"],a:2},
+{q:"28) 100m train crosses pole in 10s. Speed?",o:["10","15","20","25"],a:2},
+{q:"29) ENGLISH=FOHJTI, SCIENCE?",o:["TDJFODE","TDJFODF","TDJFNFD","TDJFOFE"],a:2},
+{q:"30) P=16,Q=17,R=18 → PRO?",o:["161815","161816","161817","161814"],a:1},
+
+/* 31–40 */
+{q:"31) Train at 54 km/hr crosses pole in 10s. Length?",o:["120m","150m","180m","200m"],a:2},
+{q:"32) x:y=3:4, y:z=6:7. x:z?",o:["9:14","18:21","3:7","6:7"],a:0},
+{q:"33) SI on ₹800 at 5% for 2 years?",o:["₹60","₹70","₹80","₹90"],a:2},
+{q:"34) 121 is square of?",o:["10","11","12","13"],a:1},
+{q:"35) Odd one out?",o:["Lion","Tiger","Cow","Leopard"],a:2},
+{q:"36) 1,8,27,64,?",o:["100","125","216","343"],a:1},
+{q:"37) A is brother of B, B sister of C. A is?",o:["Brother","Sister","Cousin","Cannot say"],a:0},
+{q:"38) TODAY → UPEBZ, TOMORROW?",o:["UPNPSPSS","UPNPSXPS","UPNPSPXT","UPNPSSXT"],a:0},
+{q:"39) 40% of a number is 240. Number?",o:["400","500","600","700"],a:2},
+{q:"40) Avg of first 10 natural numbers?",o:["5","5.5","6","6.5"],a:1},
+
+/* 41–50 */
+{q:"41) 30% of 90?",o:["18","21","27","30"],a:2},
+{q:"42) If A=1, B=2, then CAT=?",o:["24","3120","321","3-1-20"],a:1},
+{q:"43) Which is not a prime?",o:["11","13","15","17"],a:2},
+{q:"44) Speed = Distance / ?",o:["Time","Work","Power","Force"],a:0},
+{q:"45) 5 men can do work in 10 days. 10 men take?",o:["2","5","10","20"],a:1},
+{q:"46) If 2x=18, x=?",o:["7","8","9","10"],a:2},
+{q:"47) Odd one out?",o:["RAM","ROM","CPU","HDD"],a:2},
+{q:"48) 1:4 :: 2:?",o:["6","8","4","16"],a:1},
+{q:"49) A shopkeeper sells at cost. Gain/Loss?",o:["Gain","Loss","No profit no loss","Cannot say"],a:2},
+{q:"50) Which is smallest?",o:["0.5","0.05","0.005","0.0005"],a:3}
+];
+
+let currentQ=0, score=0, username="";
+
+function startQuiz(){
+  username=document.getElementById("username").value.trim();
+  if(!username){alert("Enter your name");return;}
+  if(localStorage.getItem("attempt_"+username)){
+    alert("Already attempted!");
+    return;
+  }
+  document.getElementById("nameCard").style.display="none";
+  document.getElementById("quizCard").style.display="block";
+  loadQuestion();
+}
+
+function loadQuestion(){
+  const q=questions[currentQ];
+  document.getElementById("questionBox").innerHTML=`
+    <h3>Question ${currentQ+1} / ${questions.length}</h3>
+    <p><b>${q.q}</b></p>
+    <div class="options">
+      ${q.o.map((op,i)=>`
+        <label><input type="radio" name="option" value="${i}"> ${op}</label>
+      `).join("")}
+    </div>`;
+}
+
+function nextQuestion(){
+  const sel=document.querySelector('input[name="option"]:checked');
+  if(!sel){alert("Select an option");return;}
+  if(+sel.value===questions[currentQ].a) score++;
+  currentQ++;
+  currentQ<questions.length ? loadQuestion() : finishQuiz();
+}
+
+function finishQuiz(){
+  document.getElementById("quizCard").style.display="none";
+  let data=JSON.parse(localStorage.getItem("scores"))||[];
+  data.push({name:username,score,time:Date.now()});
+  data.sort((a,b)=>b.score-a.score||a.time-b.time);
+  localStorage.setItem("scores",JSON.stringify(data));
+  localStorage.setItem("attempt_"+username,true);
+  const rank=data.findIndex(d=>d.name===username&&d.score===score)+1;
+  document.getElementById("result").style.display="block";
+  document.getElementById("result").innerHTML=
+    `🎯 ${username}<br>Score: ${score} / ${questions.length}<br>Rank: ${rank}`;
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  const t=document.getElementById("leaderboard");
+  t.innerHTML="<tr><th>Rank</th><th>Name</th><th>Score</th></tr>";
+  (JSON.parse(localStorage.getItem("scores"))||[])
+    .slice(0,10)
+    .forEach((d,i)=>{
+      t.innerHTML+=`<tr><td>${i+1}</td><td>${d.name}</td><td>${d.score}</td></tr>`;
+    });
+}
+renderLeaderboard();
+</script>
+
+</body>
+</html>
