@@ -71,7 +71,15 @@ margin-top:100px;
 
 <script>
 
-let team="";
+let team = localStorage.getItem("team");
+
+// if already registered
+if(team){
+document.getElementById("teamBox").style.display="none";
+document.getElementById("buzzer").style.display="block";
+document.getElementById("teamname").innerText="Team: "+team;
+document.getElementById("buzz").style.display="inline";
+}
 
 function register(){
 
@@ -81,6 +89,8 @@ if(team==""){
 alert("Enter team name");
 return;
 }
+
+localStorage.setItem("team",team);
 
 document.getElementById("teamBox").style.display="none";
 document.getElementById("buzzer").style.display="block";

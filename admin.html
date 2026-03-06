@@ -50,8 +50,7 @@ let data=snapshot.val();
 
 if(data && data.winner){
 
-document.getElementById("winner").innerHTML=
-"🏆 "+data.winner+" pressed first!";
+document.getElementById("winner").innerHTML="🏆 "+data.winner+" pressed first!";
 
 document.body.style.background="yellow";
 
@@ -123,7 +122,7 @@ db.update({locked:true});
 
 function reset(){
 
-db.set({
+db.update({
 winner:"",
 locked:true
 });
