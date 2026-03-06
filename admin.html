@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+
+<style>
+
+body{
+text-align:center;
+font-family:Arial;
+}
+
+#winner{
+font-size:40px;
+color:green;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>Quiz Admin Control</h1>
+
+<h2 id="winner">Waiting for buzz...</h2>
+
+<button onclick="countdown()">Start Question</button>
+
+<button onclick="lock()">Lock</button>
+
+<button onclick="reset()">Next Question</button>
+
+<h2>Leaderboard</h2>
+
+<ul id="board"></ul>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+<script src="firebase.js"></script>
+
+<script>
+
+let scores={};
+
+db.on("value",function(snapshot){
+
+let data=snapshot.val();
+
+if(data && data.winner){
+
+document.getElementById("winner").innerHTML=
+"🏆 "+data.winner+" pressed first!";
+
+document.body.style.background="yellow";
+
+setTimeout(()=>{
+document.body.style.background="white";
+},300);
+
+if(!scores[data.winner]){
+scores[data.winner]=0;
+}
+
+scores[data.winner]++;
+
+updateBoard();
+
+}
+
+});
+
+function updateBoard(){
+
+let board=document.getElementById("board");
+
+board.innerHTML="";
+
+for(let t in scores){
+
+board.innerHTML+="<li>"+t+" : "+scores[t]+"</li>";
+
+}
+
+}
+
+function countdown(){
+
+let count=3;
+
+document.getElementById("winner").innerText="Starting in "+count;
+
+let timer=setInterval(()=>{
+
+count--;
+
+if(count>0){
+
+document.getElementById("winner").innerText="Starting in "+count;
+
+}else{
+
+clearInterval(timer);
+
+document.getElementById("winner").innerText="GO!";
+
+unlock();
+
+}
+
+},1000);
+
+}
+
+function unlock(){
+db.update({locked:false});
+}
+
+function lock(){
+db.update({locked:true});
+}
+
+function reset(){
+
+db.set({
+winner:"",
+locked:true
+});
+
+document.getElementById("winner").innerText="Waiting...";
+
+}
+
+</script>
+
+</body>
+</html>
